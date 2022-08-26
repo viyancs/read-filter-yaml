@@ -1,1 +1,5 @@
-# read-filter-yaml
+# USAGE
+
+<pre>
+./api_version.sh -f test.yaml
+</pre>
