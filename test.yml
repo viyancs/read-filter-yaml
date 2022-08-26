@@ -1,0 +1,253 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-listings-svc
+  namespace: ps-dev-alpha
+  labels:
+    app: web-listings
+spec:
+  type: NodePort
+  ports:
+  - port: 3003
+    targetPort: 3003
+    name: http-3003
+  selector:
+    app: web-listings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-listings
+  namespace: ps-dev-alpha
+  labels:
+    app: web-listings
+spec:
+  selector:
+    matchLabels:
+      app: web-listings
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-listings
+        date: 2020-04-30
+    spec:
+      imagePullSecrets:
+        - name: gcr
+      volumes:
+        - name: web-listings-volume
+          emptyDir: {}
+      containers:
+        - name: web-listings
+          image: gcr.io/ps-prod-container-repo/web-listings:latest
+          ports:
+            - containerPort: 3003
+          readinessProbe:
+            httpGet:
+              path: /web-listings/uptest
+              port: 3003
+              scheme: HTTP
+            initialDelaySeconds: 15
+          volumeMounts:
+            - name: web-listings-volume
+              mountPath: /data/logs
+          resources:
+            limits:
+              cpu: "700m"
+              memory: "512Mi"
+          env:
+            - name: CLUSTER_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: CLUSTER_ID
+            - name: CLUSTER_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: CLUSTER_TYPE
+            - name: SSO_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: SSO_CLIENT_ID
+            - name: SSO_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: SSO_CLIENT_SECRET
+            - name: ACTION_STORE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: ACTION_STORE_HOST
+            - name: FACEBOOK_APP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: FACEBOOK_APP_ID
+            - name: GOOGLE_SITE_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: GOOGLE_SITE_ID
+            - name: GOOGLE_MAPS_BROWSER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: GOOGLE_MAPS_BROWSER_KEY
+            - name: GOOGLE_MAPS_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: GOOGLE_MAPS_SIGNING_KEY
+            - name: IOS_APP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: IOS_APP_ID
+            - name: EXTERNAL_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: EXTERNAL_ADDRESS
+            - name: HANDSHAKE_EXTERNAL
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: HANDSHAKE_EXTERNAL
+            - name: HANDSHAKE_INTERNAL
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: HANDSHAKE_INTERNAL
+            - name: HANDSHAKE_ENV
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: HANDSHAKE_ENV
+            - name: PINTEREST_APP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: PINTEREST_APP_ID
+            - name: TWITTER_APP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: TWITTER_APP_ID
+            - name: SEGMENT_IO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: SEGMENT_IO_API_KEY
+            - name: SIFT_SCIENCE_SNIPPET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: SIFT_SCIENCE_SNIPPET_KEY
+            - name: FORTER_SNIPPET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: FORTER_SNIPPET_KEY
+            - name: CRONOFY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: service-keys
+                  key: CRONOFY_CLIENT_ID
+            - name: CRONOFY_CB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: service-config
+                  key: CRONOFY_CB_URI
+            - name: LISTINGS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: LISTINGS_HOST
+            - name: MESSAGING_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: MESSAGING_HOST
+            - name: STRIPE_MIGRATION_NAV_ON
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: STRIPE_MIGRATION_NAV_ON
+            - name: FAVORITES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: FAVORITES_HOST
+            - name: PROFILES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: PROFILES_HOST
+            - name: RECOMMEND_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: RECOMMEND_HOST
+            - name: ENV_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: ENV_HOST
+            - name: REVIEWS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: REVIEWS_HOST
+            - name: PROJECTS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: PROJECTS_HOST
+            - name: SEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: SEARCH_HOST
+            - name: SEARCH_V2_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: SEARCH_V2_HOST
+            - name: SSO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: SSO_HOST
+            - name: COLLECTIONS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: COLLECTIONS_HOST
+            - name: CALENDAR_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: service-locations
+                  key: CALENDAR_HOST
+            - name: LINK_TO_STYLES_SUFFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster
+                  key: LINK_TO_STYLES_SUFFIX
+            - name: CLUSTER_WORKER_COUNT
+              value: "1"
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-listings
+  namespace: ps-dev-alpha
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-listings
+  minReplicas: 1
+  maxReplicas: 1
